@@ -1,0 +1,5 @@
+*.gem
+*.json
+drive-v2.cache
+drive.log
+drive.rb-oauth2.json
