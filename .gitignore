@@ -1,3 +1,5 @@
+*.ipa
+*.apk
 *.gem
 *.json
 drive-v2.cache

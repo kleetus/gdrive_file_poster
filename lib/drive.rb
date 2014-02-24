@@ -13,6 +13,7 @@ class GDrive
       puts "#{credential_file_store} does not exist"
       exit -1
     end
+    @credential_file_store = credential_file_store
     setup
   end  
   
@@ -22,10 +23,10 @@ class GDrive
     logger = Logger.new(log_file)
     logger.level = Logger::DEBUG
   
-    @client = Google::APIClient.new(:application_name => 'Ruby Drive sample',
-        :application_version => '1.0.0')
+    @client = Google::APIClient.new(:application_name => 'GDrive App Uploader',
+        :application_version => '0.0.1')
   
-    file_storage = Google::APIClient::FileStorage.new(credential_file_store)
+    file_storage = Google::APIClient::FileStorage.new(@credential_file_store)
     if file_storage.authorization.nil?
       client_secrets = Google::APIClient::ClientSecrets.load
       flow = Google::APIClient::InstalledAppFlow.new(
@@ -44,7 +45,7 @@ class GDrive
         @drive = Marshal.load(file)
       end
     else
-      @drive = client.discovered_api('drive', API_VERSION)
+      @drive = @client.discovered_api('drive', API_VERSION)
       File.open(CACHED_API_FILE, 'w') do |file|
         Marshal.dump(@drive, file)
       end
@@ -67,6 +68,4 @@ class GDrive
   
     puts result.data.to_hash
   end
-  
 end
-

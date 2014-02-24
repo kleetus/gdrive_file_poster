@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+require 'drive'
+require 'optparse'
+
+
+def parse_options(args)
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: gdrive_app_poster --credentials <credentials> --file <file_name> --parent <parent_id> [--mimeType <mimeType>]"
+
+    opts.on("-c", "--credentials [CREDENTIALS]", "Credentials json needed for logging into Google Drive e.g. /tmp/credentials_store.json") do |c|
+      options[:credentials] = c
+    end
+    
+    opts.on("-f", "--file [FILE_NAME]", "File name, description, and title as seen in Google Drive's interface") do |f|
+      options[:file] = f
+    end
+    
+    opts.on("-p", "--parent [PARENT]", "Parent ID supplied by Google Drive for the parent folder, if any") do |p|
+      options[:parent] = p
+    end
+    
+    opts.on("-m", "--mimetype [MIMETYPE]", "Mimetype for the file.") do |m|
+      options[:mimetype] = m
+    end
+
+    end.parse!
+
+  options
+end
+
+options = parse_options(ARGV)
+
+if not options[:credentials] or not options[:file] or not options[:parent]
+  puts "You must supply credentials, file, and parent options."
+  exit -1
+end
+
+drive = GDrive.new(options[:credentials])
+unpathed_file_name = options[:file].split('/').last
+drive.insert_file({
+  file: options[:file],
+  mimeType: (options[:mimetype] || 'application/vnd.android.package-archive'),
+  description: unpathed_file_name,
+  title: unpathed_file_name,
+  parents: [{id: options[:parent]}]
+})
